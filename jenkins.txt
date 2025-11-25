@@ -1,0 +1,355 @@
+1. Prerequisites / Setup
+
+Before creating the pipeline:
+
+1.1 Jenkins Installation
+
+Jenkins installed and running on localhost.
+
+Required plugins:
+
+Pipeline
+
+Git Plugin
+
+1.2 Tool Configuration
+
+Go to:
+Manage Jenkins → Global Tool Configuration
+
+Configure:
+
+JDK (e.g., JDK-17)
+
+Maven (e.g., Maven-3.9)
+
+Git
+
+⭐ 2. GitHub Maven Project
+
+The GitHub repository must contain:
+
+pom.xml
+
+src/main/java/...
+
+(Optional) Jenkinsfile
+
+Example repo used in exam:
+
+https://github.com/<username>/<MavenJavaProject>.git
+
+⭐ 3. Create a Jenkins Pipeline Job
+Steps:
+
+Jenkins Dashboard → New Item
+
+Name: JavaBuildPipeline
+
+Select Pipeline
+
+Click OK
+
+⭐ 4. Write the Jenkinsfile
+
+You either:
+
+Paste it directly into Jenkins, or
+
+Save it in your repo as Jenkinsfile
+
+✔ Full Jenkinsfile Solution (Exam-Ready)
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven-3.9'   // Name configured in Jenkins
+        jdk 'JDK-17'        // Name configured in Jenkins
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/<username>/<MavenJavaProject>.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'    // Linux labs
+                // bat 'mvn clean install' // Windows labs
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                sh 'java -cp target/*.jar com.example.App'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "BUILD SUCCESS and Application Executed Successfully!"
+        }
+        failure {
+            echo "BUILD FAILED!"
+        }
+    }
+}
+
+
+✔ This Jenkinsfile performs all required tasks:
+
+Clone
+
+Build using Maven
+
+Run the Java program
+
+Display success message
+
+⭐ 5. Run the Pipeline
+
+Click:
+
+Build Now
+
+⭐ 6. Expected Console Output (What you must show in practical)
+
+Console logs will include:
+
+Cloning into...
+[INFO] Scanning for projects...
+[INFO] Building Maven Java Project
+[INFO] -------------------------------------------------
+[INFO] BUILD SUCCESS
+-------------------------------------------------------
+Output of Java Program:
+Hello from Java Application!
+-------------------------------------------------------
+Finished: SUCCESS
+
+⭐ 7. Jenkins Pipeline View (Stage View)
+
+The stage view will show three stages:
+
+Clone Repository  →  Build  →  Run Application
+
+
+Each stage will be shown in green after success.
+Screenshot this for your practical.
+
+⭐ 8. Final Exam Summary Answer
+
+To automate a Java Maven project using Jenkins Pipeline:
+
+Configure Git, JDK, and Maven inside Jenkins.
+
+Create a Pipeline job in Jenkins.
+
+Write Jenkinsfile containing stages for:
+
+Pulling the project from GitHub
+
+Building using mvn clean install
+
+Running the application
+
+Run the pipeline and verify:
+
+Console output shows BUILD SUCCESS
+
+Final application output is displayed in the last stage
+
+Jenkins Pipeline View shows all stages
+
+This completes the CI automation of the Java project.
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+✅ 1. Prerequisites & Environment Setup
+
+Before creating the pipeline:
+
+1.1 Install & Configure Jenkins
+
+Jenkins installed and running.
+
+Required plugins:
+
+Pipeline
+
+Git
+
+Deploy to Container Plugin
+
+1.2 Configure JDK and Maven in Jenkins
+
+Go to:
+Manage Jenkins → Global Tool Configuration
+
+Add:
+
+JDK 17
+
+Maven 3.x
+
+1.3 Configure Apache Tomcat
+
+Install Apache Tomcat (v8/9/10)
+
+Start server:
+http://localhost:8080
+
+Create a Tomcat manager user in tomcat-users.xml:
+
+<user username="admin" password="admin123" roles="manager-script,manager-gui"/>
+
+
+Restart Tomcat.
+
+1.4 Add Tomcat Credentials in Jenkins
+
+Manage Jenkins → Credentials → Global → Add Credentials
+
+Username: admin
+
+Password: admin123
+
+ID: tomcat-creds
+
+⭐ 2. Create Jenkins Pipeline Job
+
+Dashboard → New Item
+
+Name: WebAppPipeline
+
+Select Pipeline
+
+Click OK
+
+⭐ 3. Configure GitHub Repository
+
+Under Pipeline → Definition: Pipeline script
+Add your GitHub repo URL inside the Jenkinsfile.
+
+⭐ 4. Jenkinsfile (Full Pipeline Script)
+
+This is the script you paste inside Jenkins OR save as Jenkinsfile in GitHub.
+
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven-3.9'   // Name configured in Jenkins
+        jdk 'JDK-17'
+    }
+
+    stages {
+
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/<username>/<web-project>.git'
+            }
+        }
+
+        stage('Build WAR') {
+            steps {
+                sh 'mvn clean package'   // Linux
+                // bat 'mvn clean package' // Windows labs
+            }
+        }
+
+        stage('Deploy to Tomcat') {
+            steps {
+                deploy adapters: [
+                    tomcat9(credentialsId: 'tomcat-creds', path: '', url: 'http://localhost:8080')
+                ],
+                war: 'target/*.war'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment Completed Successfully!'
+        }
+        failure {
+            echo 'Build or Deployment Failed!'
+        }
+    }
+}
+
+
+✔ Clones
+✔ Builds WAR
+✔ Deploys to Tomcat
+✔ Shows status
+
+⭐ 5. Run the Pipeline
+
+Click:
+
+Build Now
+
+⭐ 6. Expected Console Output
+Cloning repository...
+[INFO] Building web application...
+[INFO] BUILD SUCCESS
+Deploying to Tomcat at http://localhost:8080
+Upload complete
+Deployment successful
+
+
+✔ Shows WAR file deployed
+✔ Shows BUILD SUCCESS
+
+⭐ 7. Jenkins Pipeline View
+
+Pipeline Stage View will show:
+
+Clone Repository  →  Build WAR  →  Deploy to Tomcat  →  Post Actions
+
+
+Take a screenshot in your exam.
+
+⭐ 8. Proof of Web App Running
+
+Open browser:
+
+http://localhost:8080/<your-webapp-name>
+
+
+You will see your application's homepage (index.jsp / index.html).
+
+Take a screenshot as the final proof.
+
+⭐ 9. Final Exam Answer Summary
+
+Steps to automate deployment with Jenkins:
+
+Configure Jenkins with JDK, Maven, Git, and Tomcat credentials.
+
+Install and configure Tomcat web server with manager-script role.
+
+Create a Jenkins Pipeline job.
+
+Write a Jenkinsfile containing:
+
+Git clone
+
+Maven build for WAR
+
+Deployment to Tomcat using “Deploy to Container” plugin
+
+Run the pipeline and verify:
+
+Pipeline Stage View
+
+Console output “BUILD SUCCESS”
+
+Web application running on localhost:8080
