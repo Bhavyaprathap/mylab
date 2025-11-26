@@ -308,6 +308,47 @@ If your app is not running go to security  and Click on security groups, Click o
 
 
 
+DockerHub:
+
+{Basic Dockerfile to perform docker cli commands}:
+Dockerfile:
+From redis:latest
+CMD ["redis-server"] 
+
+
+*save this as a Dockerfile, Go to cmd Run as adminstrator-> paste the path of Dockerfile->ls
+*create a image  docker build -t redisimg
+*docker images (to check a image created or not),
+*run image as a container as ->docker run --name newmyredis -d redisimg->docker ps
+*copy container id in docker ps for a newmyredis container->docker stop <containerid>->
+docker commit <containerid> <docker-hub name>/redisnewimg
+*docker login->docker push <dockerhub-name>/redisnewimg
+
+
+Example Dockerfile:
+
+FROM node:16-alpine
+WORKDIR /app
+COPY calculator.js/app
+CMD ["node","calculator.js"]
+
+*docker login
+*dockerr tag calculas <dockerhub-name>/simple_cal
+*docker commit <containerid> <docker-hub name>/simple_cal
+*docker push <dockerhub-name>/simple_cal
+
+
+->
+Monitoring nagios:
+1.cmd run as adminstrator,background docker should be open
+2.docker pull jasonrivers/nagios:latest
+3.docker run --name nagiosdemo -p 8888:80 jasonrivers/nagios:latest (after executing if u get succesful go to localhost:8888)
+4.enetr credentials as username:admin
+pass:nagios (or) Nagios
+5.u will get a nagios dashboard
+6.click on hosts on leftside bar (u can see system status check etc...)
+7.if u want to stop use ->docker stop nagiosdemo
+
 
 
 
